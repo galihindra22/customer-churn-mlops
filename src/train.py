@@ -1,5 +1,6 @@
 # src/train.py
 import pandas as pd
+import os
 import joblib
 import mlflow
 from sklearn.ensemble import RandomForestClassifier
@@ -17,6 +18,7 @@ feature_columns = X_train.columns.tolist()
 model = RandomForestClassifier()
 model.fit(X_train, y_train)
 
+os.makedirs("models", exist_ok=True)
 # Save model, encoder, scaler
 joblib.dump(model, "models/model.pkl")
 joblib.dump(encoder, "models/encoder.pkl")
