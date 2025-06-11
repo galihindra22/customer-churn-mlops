@@ -4,15 +4,16 @@ This project implements a complete **MLOps pipeline** for customer churn predict
 
 ---
 
-## Project Overview
+## Technologies Used
 
-| Stage                | Tool / Method          |
-|----------------------|------------------------|
-| Data Preprocessing   | pandas, scikit-learn   |
-| Model Training       | RandomForestClassifier |
-| Experiment Tracking  | MLflow                 |
-| Model Deployment     | FastAPI                |
-| API Testing          | Swagger UI             |
+| Component          | Tool                |
+|--------------------|---------------------|
+| Model Training     | scikit-learn        |
+| API                | FastAPI             |
+| Experiment Tracking| MLflow              |
+| Containerization   | Docker              |
+| CI/CD              | GitHub Actions + Railway |
+| Hosting            | Railway (free)      |
 
 ---
 
@@ -20,14 +21,18 @@ This project implements a complete **MLOps pipeline** for customer churn predict
 
 ```
 customer-churn-mlops/
-├── data/               # Dataset CSV (not pushed to GitHub)
-├── models/             # Saved model, scaler, and column metadata
+├── .github/
+│   └── workflows/
+│       └── main.yml         # GitHub Action
+├── data/                    # Dataset (local only)
+├── models/                  # Trained model files (.pkl)
 ├── src/
-│   ├── preprocess.py   # Handles encoding, scaling
-│   ├── train.py        # Trains model + logs to MLflow
-│   └── api.py          # FastAPI for live prediction
-├── requirements.txt    # Python dependencies
-├── .gitignore          # Ignore venv, model files, logs, etc.
+│   ├── api.py               # FastAPI app
+│   ├── train.py             # Training script
+│   └── preprocess.py        # Data transformation
+├── Dockerfile               # Docker container definition
+├── requirements.txt         # Python dependencies
+└── README.md
 ```
 
 ---
@@ -49,11 +54,8 @@ pip install -r requirements.txt
 ```bash
 python -m src.train
 ```
-- This will:
-  - Preprocess the dataset
-  - Train a model
-  - Log the run to **MLflow**
-  - Save: `model.pkl`, `scaler.pkl`, `columns.pkl`
+- Saves: `model.pkl`, `scaler.pkl`, `encoder.pkl`, `columns.pkl`
+- Logs experiment via **MLflow**
 
 ### 4. (Optional) View MLflow experiment tracking
 ```bash
@@ -110,9 +112,27 @@ Expected result:
 
 ---
 
+## GitHub Actions (CI/CD)
+
+This project uses GitHub Actions to automatically:
+- Install dependencies
+- Run the training pipeline on every push to `main`
+- Log the model to MLflow
+
+You can find the workflow in `.github/workflows/main.yml`.
+
+---
+
+## 🌐 Deployment (CD)
+
+- Public URL: `https://customer-churn-mlops-production.up.railway.app/docs`
+- Triggered automatically on **push to GitHub**
+- **No manual deploy button required** on Railway
+
+---
+
 ## Notes
 
-- Dataset (`customer_churn.csv`) is not pushed to GitHub; add manually to `/data/`
 - Model files (`.pkl`) are generated after running `train.py`
 - The pipeline can be extended with GitHub Actions and Docker for full CI/CD
 
