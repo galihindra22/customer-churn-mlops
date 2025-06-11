@@ -65,7 +65,7 @@ Open in browser: [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ---
 
-## Run the API Server
+### 5. Run the API Server
 
 ```bash
 uvicorn src.api:app --reload
@@ -112,7 +112,7 @@ Expected result:
 
 ---
 
-## GitHub Actions (CI/CD)
+## GitHub Actions (CI)
 
 This project uses GitHub Actions to automatically:
 - Install dependencies
