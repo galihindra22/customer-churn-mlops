@@ -72,7 +72,7 @@ uvicorn src.api:app --reload
 ```
 
 Visit Swagger UI: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)  
-Use the `/predict` endpoint to send customer data and receive churn prediction.
+Use the `/predict` endpoint to send customer data and receive churn prediction!
 
 ---
 
