@@ -16,9 +16,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # Models to compare
 models = {
-    "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42),
-    "Decision Tree": DecisionTreeClassifier(random_state=42),
-    "Logistic Regression": LogisticRegression(max_iter=1000, random_state=42)
+    "Random Forest": RandomForestClassifier(n_estimators=100, max_depth=5),
+    "Decision Tree": DecisionTreeClassifier(max_depth=3),
+    "Logistic Regression": LogisticRegression(C=0.5, max_iter=1000)
 }
 
 best_model_name = None
