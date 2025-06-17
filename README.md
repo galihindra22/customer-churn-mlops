@@ -75,13 +75,7 @@ pip install -r requirements.txt
 python -m src.train
 ```
 
-5. Run FastAPI (Swagger UI):
-
-```bash
-uvicorn src.api:app --reload
-```
-
-6. Run Streamlit UI:
+5. Run Streamlit UI:
 
 ```bash
 streamlit run app.py
