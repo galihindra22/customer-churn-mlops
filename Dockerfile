@@ -13,7 +13,6 @@ COPY ./src ./src
 COPY ./models ./models
 
 # Set env vars for FastAPI
-ENV PYTHONPATH=/app
 EXPOSE 8000
 
 # Run the FastAPI app

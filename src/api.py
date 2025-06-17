@@ -1,22 +1,19 @@
-# src/api.py
-import joblib
-import numpy as np
-import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel
-from sklearn.preprocessing import StandardScaler
-from starlette.responses import JSONResponse
+import joblib
+import pandas as pd
 
-app = FastAPI()
-
-# Load model, encoder, scaler
+# Load model and artifacts
 model = joblib.load("models/model.pkl")
+encoder = joblib.load("models/encoder.pkl")
 scaler = joblib.load("models/scaler.pkl")
-model_input_columns = joblib.load("models/columns.pkl")
+columns = joblib.load("models/columns.pkl")
+best_model_name = joblib.load("models/best_model_name.pkl")
 
+app = FastAPI(title="Customer Churn Prediction API")
 
-
-class ChurnInput(BaseModel):
+# Define input schema
+class InputData(BaseModel):
     gender: str
     SeniorCitizen: int
     Partner: str
@@ -37,25 +34,28 @@ class ChurnInput(BaseModel):
     MonthlyCharges: float
     TotalCharges: float
 
+@app.get("/")
+def root():
+    return {"message": "Churn Prediction API is running!"}
+
 @app.post("/predict")
-def predict(input: ChurnInput):
-    # Convert input to DataFrame
-    input_df = pd.DataFrame([input.dict()])
+def predict(data: InputData):
+    df_input = pd.DataFrame([data.dict()])
 
-    # Preprocess categorical (same as in training)
-    input_encoded = pd.get_dummies(input_df)
+    # One-hot encode seperti di training
+    df_input = pd.get_dummies(df_input)
 
-    # Align columns
-    input_encoded = input_encoded.reindex(columns=model_input_columns, fill_value=0)
+    # Tambahkan kolom yang mungkin hilang
+    df_input = df_input.reindex(columns=columns, fill_value=0)
 
-    # Scale input
-    input_scaled = scaler.transform(input_encoded)
+
+    # Scale
+    df_input = scaler.transform(df_input)
 
     # Predict
-    pred = model.predict(input_scaled)
-    prob = model.predict_proba(input_scaled)[0][1]
-
-    return JSONResponse({
-        "churn_prediction": int(pred[0]),
-        "churn_probability": round(prob, 3)
-    })
+    prediction = model.predict(df_input)[0]
+    result = "Yes" if prediction == 1 else "No"
+    return {
+        "prediction": result,
+        "model_used": best_model_name
+    }

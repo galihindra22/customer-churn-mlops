@@ -1,33 +1,49 @@
-# src/train.py
 import pandas as pd
-import os
+import numpy as np
 import joblib
-import mlflow
-from sklearn.ensemble import RandomForestClassifier
+import os
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
 from src.preprocess import load_and_preprocess
 
-mlflow.set_experiment("Churn_Prediction")
-
-# Load and preprocess data
-X, y, encoder, scaler = load_and_preprocess("data/customer_churn.csv")
-
+# Load and preprocess dataset
+X, y, encoder, scaler, input_columns = load_and_preprocess("data/customer_churn.csv")
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-feature_columns = X_train.columns.tolist()
-# Train model
-model = RandomForestClassifier()
-model.fit(X_train, y_train)
 
+# Models to compare
+models = {
+    "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42),
+    "Decision Tree": DecisionTreeClassifier(random_state=42),
+    "Logistic Regression": LogisticRegression(max_iter=1000, random_state=42)
+}
+
+best_model_name = None
+best_model = None
+best_accuracy = 0.0
+
+# Evaluate each model
+for name, model in models.items():
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    acc = accuracy_score(y_test, y_pred)
+    print(f"{name} Accuracy: {acc:.4f}")
+    if acc > best_accuracy:
+        best_accuracy = acc
+        best_model = model
+        best_model_name = name
+
+print(f"Best Model: {best_model_name} with accuracy {best_accuracy:.4f}")
+
+# Save best model and artifacts
 os.makedirs("models", exist_ok=True)
-# Save model, encoder, scaler
-joblib.dump(model, "models/model.pkl")
+joblib.dump(best_model, "models/model.pkl")
 joblib.dump(encoder, "models/encoder.pkl")
 joblib.dump(scaler, "models/scaler.pkl")
-joblib.dump(feature_columns, "models/columns.pkl")
-# Track with MLflow
-with mlflow.start_run():
-    mlflow.log_param("model_type", "random forest")
-    mlflow.log_metric("accuracy", model.score(X_test, y_test))
-    mlflow.sklearn.log_model(model, "model")
+joblib.dump(input_columns, "models/columns.pkl")
+joblib.dump(best_model_name, "models/best_model_name.pkl")
 
-print("Model trained and saved.")
+print("Best model saved successfully.")

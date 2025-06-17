@@ -19,4 +19,4 @@ def load_and_preprocess(path):
     X_scaled = scaler.fit_transform(X)
     X_scaled = pd.DataFrame(X_scaled, columns=X.columns)
 
-    return X_scaled, y, le, scaler
+    return X_scaled, y, le, scaler, X.columns.tolist()
